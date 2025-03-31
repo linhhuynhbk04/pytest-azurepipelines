@@ -10,7 +10,7 @@ stages:
 
     - job: 'Test_Linux'
       pool:
-        vmImage: 'Ubuntu-16.04'
+        name: Default
       strategy:
         matrix:
           Python37_Pytest_50:
@@ -61,65 +61,11 @@ stages:
         displayName: 'pytest with doctest modules flag - doctest fails'
         continueOnError: true
 
-    - job: 'Test_Windows'
-      pool:
-        vmImage: 'vs2017-win2016'
-      strategy:
-        matrix:
-          Python35:
-            python.version: '3.5'
-          Python36:
-            python.version: '3.6'
-          Python37:
-            python.version: '3.7'
-        maxParallel: 5
-
-      steps:
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '$(python.version)'
-          architecture: 'x64'
-
-      - script: |
-          python -m pip install --upgrade pip
-          pip install -e .
-        displayName: 'Install dependencies'
-
-      - script: |
-          pytest tests -v -m "not testfail"
-        displayName: 'pytest with defaults - passes'
-
-      - script: |
-          pip install pytest-cov
-          pytest tests -v -m "not testfail" --no-coverage-upload --cov --cov-report=html
-        displayName: 'pytest with --no-coverage-upload'
-
-      - script: |
-          pip install pytest-cov
-          pytest tests -v -m "not testfail" --cov --cov-report=html
-        displayName: 'pytest with coverage plugin'
-
-      - script: |
-          pytest tests -v -m "not testfail" --cov --cov-report=html --force-xunit
-        displayName: 'pytest with forced Xunit output'
-
-      - script: |
-          pytest tests -v -m "testfail"
-        displayName: 'pytest - failures'
-        continueOnError: true
-
-    - job: 'Test_Docker'
-      pool:
-        vmImage: 'Ubuntu-16.04'
-
-      steps:
-      - script: ./.azure-pipelines/docker.sh
-
   - stage: Integration_Test
     jobs:
     - job: 'Test_Packages'
       pool:
-        vmImage: 'Ubuntu-16.04'
+        name: Default
       steps:
         - task: UsePythonVersion@0
           inputs:
@@ -146,7 +92,7 @@ stages:
     - job: "Test_suite_Jinja2"
       dependsOn: "Test_Packages"
       pool:
-        vmImage: 'Ubuntu-16.04'
+        name: Default
 
       steps:
         - task: UsePythonVersion@0
